@@ -53,11 +53,11 @@ local function label(parent, value, size, color, font)
     }, parent)
 end
 
--- SCRIPT URL MAPPING
+-- SCRIPT URL MAPPING (Updated Blox Fruits)
 local scriptURLs = {
     ["Brookhaven RP"] = "https://raw.githubusercontent.com/nxvap/Hexagon/refs/heads/main/brookhaven",
     ["Adopt Me!"] = "https://raw.githubusercontent.com/eIysia-dev/best/refs/heads/main/loader",
-    ["Blox Fruits"] = "https://raw.githubusercontent.com/ShowScript79/cokkahub/refs/heads/main/cokkahub",
+    ["Blox Fruits"] = "https://raw.githubusercontent.com/REDzHUB/BloxFruits/main/redz9999.lua", -- Updated!
     ["Murder Mystery 2"] = "https://raw.githubusercontent.com/xv3gasx/Murder-Mystery-2/refs/heads/main/Release.lua",
     ["Jailbreak"] = "https://raw.githubusercontent.com/veloxides/Jailbreak/refs/heads/main/VeloxideLoader",
     ["Welcome to Bloxburg"] = "https://azurix.vercel.app/",
@@ -176,15 +176,13 @@ local gui = make("ScreenGui", {
     DisplayOrder=50, ZIndexBehavior=Enum.ZIndexBehavior.Sibling,
 }, playerGui)
 
--- LOADING SCREEN
+-- LOADING SCREEN (Text removed)
 local intro = make("Frame", {Size=UDim2.fromScale(1,1), BackgroundColor3=THEME.bg, ZIndex=100, Visible=true}, gui)
 local introIcon = make("ImageLabel", {
     AnchorPoint=Vector2.new(.5,.5), Position=UDim2.fromScale(.5,.4), Size=UDim2.fromOffset(120,120),
     BackgroundTransparency=1, Image=LUMINA_ICON, ImageColor3=THEME.white
 }, intro)
-local introWord = label(intro, "L U M I N A", 28, THEME.white, Enum.Font.GothamBold)
-introWord.AnchorPoint=Vector2.new(.5,.5); introWord.Position=UDim2.fromScale(.5,.53)
-introWord.Size=UDim2.fromOffset(350,50); introWord.TextXAlignment=Enum.TextXAlignment.Center
+-- The "L U M I N A" text was here, it is now removed.
 local introSub = label(intro, "LOADING YOUR LIBRARY...", 10, THEME.muted, Enum.Font.GothamMedium)
 introSub.AnchorPoint=Vector2.new(.5,.5); introSub.Position=UDim2.fromScale(.5,.58)
 introSub.Size=UDim2.fromOffset(300,24); introSub.TextXAlignment=Enum.TextXAlignment.Center
@@ -224,7 +222,7 @@ make("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,Padding=UDim.ne
 local cards=make("ScrollingFrame",{Position=UDim2.fromOffset(19,159),Size=UDim2.new(1,-38,1,-176),BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=3,ScrollBarImageColor3=THEME.purple,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},body)
 local grid=make("UIGridLayout",{CellSize=UDim2.fromOffset(160,158),CellPadding=UDim2.fromOffset(10,10),SortOrder=Enum.SortOrder.LayoutOrder},cards)
 
--- DETAILS PANEL (NOW A SCROLLING FRAME FOR MOBILE)
+-- DETAILS PANEL
 local details=make("ScrollingFrame",{Name="Details",Position=UDim2.fromScale(1,0),Size=UDim2.fromScale(1,1),BackgroundColor3=THEME.bg,Visible=false,ZIndex=20,CanvasSize=UDim2.new(0,0,0,650),ScrollBarThickness=3,ScrollBarImageColor3=THEME.purple},body)
 local back=make("TextButton",{Text="←  BACK TO LIBRARY",TextSize=11,TextColor3=THEME.muted,Font=Enum.Font.GothamMedium,BackgroundTransparency=1,Position=UDim2.fromOffset(19,12),Size=UDim2.fromOffset(190,31),ZIndex=21},details)
 local detailImage=make("ImageLabel",{Position=UDim2.fromOffset(19,53),Size=UDim2.new(1,-38,0,160),BackgroundColor3=THEME.card,Image="",ScaleType=Enum.ScaleType.Crop,ZIndex=21},details); corner(detailImage,12)
@@ -457,7 +455,7 @@ task.spawn(function()
     introSub.Text = "READY."
     tween(intro, 0.6, {BackgroundTransparency = 1})
     tween(introIcon, 0.6, {ImageTransparency = 1})
-    tween(introWord, 0.6, {TextTransparency = 1})
+    -- Note: The old "LUMINA" text tween was removed here
     tween(introSub, 0.6, {TextTransparency = 1})
     tween(barBack, 0.6, {BackgroundTransparency = 1})
     tween(bar, 0.6, {BackgroundTransparency = 1})
