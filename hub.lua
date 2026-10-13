@@ -1,10 +1,8 @@
--- LUMINA V6.0 | Full Updated (Custom Script Support)
+-- LUMINA V6.0 | Roblox game discovery + script hub
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local ContentProvider = game:GetService("ContentProvider")
-local Lighting = game:GetService("Lighting")
-local VirtualUser = game:GetService("VirtualUser")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -55,24 +53,20 @@ local function label(parent, value, size, color, font)
 end
 
 -- ==========================================
--- SCRIPT URL MAPPING (KEYLESS)
+-- SCRIPT URL MAPPING (ONLY WORKING KEYLESS ONES)
 -- ==========================================
 local scriptURLs = {
+    -- These are the ones that currently have working URLs.
     ["Blox Fruits"] = "https://raw.githubusercontent.com/Kenniel123/BloxFruits/refs/heads/main/BloxFruits",
     ["Pet Simulator 99"] = "https://raw.githubusercontent.com/SlamminPig/6FootScripts/main/Scripts/PetSimulator99.lua",
     ["Arsenal"] = "https://raw.githubusercontent.com/Luigi4k85/Arsenal-v5.3/refs/heads/main/Arsenal%20v5.3",
-    ["Da Hood"] = "https://raw.githubusercontent.com/bbbbbbbbbbbbbb121/Roblox/refs/heads/main/Sylex",
+    ["Da Hood"] = "https://raw.githubusercontent.com/xulfo/Oxide-Loader/main/Main.lua",
     ["Jailbreak"] = "https://raw.githubusercontent.com/veloxides/Jailbreak/refs/heads/main/VeloxideLoader",
     ["Murder Mystery 2"] = "https://pastebin.com/raw/YpNGWssv",
     ["Blade Ball"] = "https://raw.githubusercontent.com/Doortthemort/676/refs/heads/main/Main.lua",
     ["Grow a Garden"] = "https://raw.githubusercontent.com/depthso/Grow-a-Garden/refs/heads/main/autofarm.lua",
     ["Blue Lock: Rivals"] = "https://raw.githubusercontent.com/TheDarkoneMarcillisePex/Other-Scripts/refs/heads/main/Blue%20Lock%20Rivals%20GUI",
     ["Adopt Me!"] = "https://raw.githubusercontent.com/bytelaunch-germany/adoptme-candyegg-farmer2026/main/loader.lua",
-    ["Brookhaven RP"] = "https://raw.githubusercontent.com/Bliqe/Upload/refs/heads/main/Games/BR/87347759111.lua",
-    ["Tower of Hell"] = "https://raw.githubusercontent.com/formidy/TowerOfHellAutofarm/refs/heads/main/main.lua",
-    ["Natural Disaster Survival"] = "https://raw.githubusercontent.com/KaterHub-Inc/NaturalDisasterSurvival/refs/heads/main/main.lua",
-    ["DOORS"] = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau",
-    ["The Strongest Battlegrounds"] = "https://raw.githubusercontent.com/Bliqe/Upload/refs/heads/main/Games/TSB/23217845477.lua",
 }
 
 local catalog = {
@@ -129,7 +123,6 @@ local catalog = {
 }
 
 local favorites = {}
-local customScripts = {} -- session memory for custom scripts
 local currentPage = "Home"
 local activeCategory = "All"
 local searchQuery = ""
@@ -139,17 +132,6 @@ local accentOptions = {
     Color3.fromRGB(255,103,177), Color3.fromRGB(94,220,179),
 }
 local accentIndex = 1
-
--- Universal state
-local uni = {
-    infJump = false,
-    infJumpConn = nil,
-    speed = false,
-    speedValue = 100,
-    fullbright = false,
-    antiAfk = false,
-    antiAfkConn = nil,
-}
 
 local gui = make("ScreenGui", {
     Name="LuminaV3", ResetOnSpawn=false, IgnoreGuiInset=true,
@@ -202,7 +184,7 @@ local cards=make("ScrollingFrame",{Position=UDim2.fromOffset(19,159),Size=UDim2.
 local grid=make("UIGridLayout",{CellSize=UDim2.fromOffset(160,158),CellPadding=UDim2.fromOffset(10,10),SortOrder=Enum.SortOrder.LayoutOrder},cards)
 
 -- DETAILS PANEL
-local details=make("ScrollingFrame",{Name="Details",Position=UDim2.fromScale(1,0),Size=UDim2.fromScale(1,1),BackgroundColor3=THEME.bg,Visible=false,ZIndex=20,CanvasSize=UDim2.new(0,0,0,820),ScrollBarThickness=3,ScrollBarImageColor3=THEME.purple},body)
+local details=make("ScrollingFrame",{Name="Details",Position=UDim2.fromScale(1,0),Size=UDim2.fromScale(1,1),BackgroundColor3=THEME.bg,Visible=false,ZIndex=20,CanvasSize=UDim2.new(0,0,0,650),ScrollBarThickness=3,ScrollBarImageColor3=THEME.purple},body)
 local back=make("TextButton",{Text="←  BACK TO LIBRARY",TextSize=11,TextColor3=THEME.muted,Font=Enum.Font.GothamMedium,BackgroundTransparency=1,Position=UDim2.fromOffset(19,12),Size=UDim2.fromOffset(190,31),ZIndex=21},details)
 local detailImage=make("ImageLabel",{Position=UDim2.fromOffset(19,53),Size=UDim2.new(1,-38,0,160),BackgroundColor3=THEME.card,Image="",ScaleType=Enum.ScaleType.Crop,ZIndex=21},details); corner(detailImage,12)
 local detailName=label(details,"Game name",23,THEME.white,Enum.Font.GothamBold); detailName.Position=UDim2.fromOffset(19,222); detailName.Size=UDim2.new(1,-38,0,34); detailName.ZIndex=21
@@ -212,7 +194,7 @@ local detailFavorite=make("TextButton",{Text="☆  ADD TO FAVORITES",TextSize=11
 local playButton=make("TextButton",{Text="COPY PLACE ID",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.card,Position=UDim2.fromOffset(19,380),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(playButton,9); stroke(playButton,THEME.line,.25)
 local detailId=label(details,"Place ID",10,THEME.muted); detailId.Position=UDim2.fromOffset(20,425); detailId.Size=UDim2.new(1,-40,0,22); detailId.ZIndex=21
 
--- UNIVERSAL TAB
+-- UNIVERSAL TAB PANEL
 local universalPanel=make("Frame",{Position=UDim2.fromOffset(19,73),Size=UDim2.new(1,-38,1,-73),BackgroundColor3=THEME.bg,Visible=false},body)
 local universalScroll=make("ScrollingFrame",{Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=3,ScrollBarImageColor3=THEME.purple,CanvasSize=UDim2.new(0,0,0,400)},universalPanel)
 make("UIListLayout",{Padding=UDim.new(0,10),SortOrder=Enum.SortOrder.LayoutOrder},universalScroll)
@@ -226,122 +208,55 @@ local function makeUniversalBtn(name, callback)
     btn.MouseEnter:Connect(function() tween(btn, .12, {BackgroundColor3 = THEME.cardHover}) end)
     btn.MouseLeave:Connect(function() tween(btn, .12, {BackgroundColor3 = THEME.card}) end)
     btn.MouseButton1Click:Connect(function()
-        local ok, err = pcall(callback, btn)
-        if not ok then
-            warn("[Lumina Universal]", err)
-            btn.Text = "ERROR"
-            btn.BackgroundColor3 = THEME.red
-            task.delay(2, function()
-                if btn and btn.Parent then
-                    btn.Text = name
-                    btn.BackgroundColor3 = THEME.card
-                end
-            end)
-        end
+        btn.Text = "LOADING..."
+        task.spawn(callback)
+        task.delay(2, function() if btn.Parent then btn.Text = name end end)
     end)
-    return btn
 end
 
-local function applySpeed()
-    local char = player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.WalkSpeed = uni.speed and uni.speedValue or 16
-        end
-    end
-end
-
-player.CharacterAdded:Connect(function()
-    task.wait(0.3)
-    if uni.speed then applySpeed() end
-end)
-
-makeUniversalBtn("Infinite Jump (Toggle)", function(btn)
-    uni.infJump = not uni.infJump
-    if uni.infJump then
-        if uni.infJumpConn then uni.infJumpConn:Disconnect() end
-        uni.infJumpConn = UserInputService.JumpRequest:Connect(function()
-            local char = player.Character
-            if char then
-                local hum = char:FindFirstChildOfClass("Humanoid")
-                if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
-            end
-        end)
-        btn.Text = "Infinite Jump: ON"
-        btn.BackgroundColor3 = THEME.green
-    else
-        if uni.infJumpConn then uni.infJumpConn:Disconnect(); uni.infJumpConn = nil end
-        btn.Text = "Infinite Jump (Toggle)"
-        btn.BackgroundColor3 = THEME.card
-    end
-end)
-
-makeUniversalBtn("Speed Hack (Toggle 100)", function(btn)
-    uni.speed = not uni.speed
-    applySpeed()
-    if uni.speed then
-        btn.Text = "Speed Hack: ON (100)"
-        btn.BackgroundColor3 = THEME.green
-    else
-        btn.Text = "Speed Hack (Toggle 100)"
-        btn.BackgroundColor3 = THEME.card
-    end
-end)
-
-makeUniversalBtn("Fullbright (Toggle)", function(btn)
-    uni.fullbright = not uni.fullbright
-    if uni.fullbright then
-        Lighting.Brightness = 3
-        Lighting.ClockTime = 14
-        Lighting.FogEnd = 100000
-        Lighting.GlobalShadows = false
-        Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-        btn.Text = "Fullbright: ON"
-        btn.BackgroundColor3 = THEME.green
-    else
-        Lighting.Brightness = 1
-        Lighting.FogEnd = 1000
-        Lighting.GlobalShadows = true
-        btn.Text = "Fullbright (Toggle)"
-        btn.BackgroundColor3 = THEME.card
-    end
-end)
-
-makeUniversalBtn("Reset WalkSpeed", function(btn)
-    uni.speed = false
-    applySpeed()
-    btn.Text = "RESET DONE"
-    btn.BackgroundColor3 = THEME.green
-    task.delay(1.5, function()
-        if btn and btn.Parent then
-            btn.Text = "Reset WalkSpeed"
-            btn.BackgroundColor3 = THEME.card
+-- Universal Scripts (From Scratch, Keyless)
+makeUniversalBtn("Infinite Jump (Keyless)", function()
+    local UIS = game:GetService("UserInputService")
+    UIS.JumpRequest:Connect(function()
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
         end
     end)
 end)
 
-makeUniversalBtn("Anti-AFK (Toggle)", function(btn)
-    uni.antiAfk = not uni.antiAfk
-    if uni.antiAfk then
-        if uni.antiAfkConn then uni.antiAfkConn:Disconnect() end
-        uni.antiAfkConn = player.Idled:Connect(function()
-            VirtualUser:CaptureController()
-            VirtualUser:ClickButton2(Vector2.new())
-        end)
-        btn.Text = "Anti-AFK: ON"
-        btn.BackgroundColor3 = THEME.green
-    else
-        if uni.antiAfkConn then uni.antiAfkConn:Disconnect(); uni.antiAfkConn = nil end
-        btn.Text = "Anti-AFK (Toggle)"
-        btn.BackgroundColor3 = THEME.card
+makeUniversalBtn("Speed Hack (Keyless)", function()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = 100
     end
+end)
+
+makeUniversalBtn("Fullbright (Keyless)", function()
+    local lighting = game:GetService("Lighting")
+    lighting.Brightness = 3
+    lighting.ClockTime = 14
+    lighting.FogEnd = 100000
+    lighting.GlobalShadows = false
+    lighting.OutdoorAmbient = Color3.fromRGB(128,128,128)
+end)
+
+makeUniversalBtn("Reset WalkSpeed", function()
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = 16
+    end
+end)
+
+makeUniversalBtn("Anti-AFK (Prevents Kick)", function()
+    local VirtualUser = game:GetService("VirtualUser")
+    player.Idled:Connect(function()
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+    end)
 end)
 
 local settingsPanel=make("Frame",{Position=UDim2.fromOffset(19,73),Size=UDim2.new(1,-38,0,185),BackgroundColor3=THEME.panel,Visible=false},body); corner(settingsPanel,12); stroke(settingsPanel,THEME.line,.35)
 local settingsTitle=label(settingsPanel,"Appearance",15,THEME.white,Enum.Font.GothamBold); settingsTitle.Position=UDim2.fromOffset(14,10)
 local settingsInfo=label(settingsPanel,"Customize Lumina's accent color.",11,THEME.muted); settingsInfo.Position=UDim2.fromOffset(14,40); settingsInfo.Size=UDim2.new(1,-28,0,25)
-local settingsNote=label(settingsPanel,"Favorites & custom scripts are session only.",11,THEME.muted); settingsNote.Position=UDim2.fromOffset(14,67); settingsNote.Size=UDim2.new(1,-28,0,25)
+local settingsNote=label(settingsPanel,"Favorites are kept for this session only.",11,THEME.muted); settingsNote.Position=UDim2.fromOffset(14,67); settingsNote.Size=UDim2.new(1,-28,0,25)
 local accentButton=make("TextButton",{Text="CHANGE ACCENT COLOR",TextSize=10,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.purpleDark,Position=UDim2.fromOffset(14,112),Size=UDim2.new(1,-28,0,34)},settingsPanel); corner(accentButton,8)
 
 -- SUGGESTION BAR
@@ -391,191 +306,54 @@ local function clearCards()
 end
 
 local function showDetails(item)
-    selectedGame = item
-    detailName.Text = item.name
-    detailGenre.Text = item.genre:upper()
-    detailDescription.Text = item.description
-    detailId.Text = "Place ID: " .. tostring(item.id)
-    detailImage.Image = "rbxthumb://type=GameIcon&id=" .. tostring(item.id) .. "&w=512&h=512"
-    detailFavorite.Text = favorites[item.name] and "★  REMOVE FROM FAVORITES" or "☆  ADD TO FAVORITES"
-    details.Visible = true
-    details.Position = UDim2.fromScale(1, 0)
-    tween(details, .28, {Position = UDim2.fromScale(0, 0)})
+    selectedGame=item
+    detailName.Text=item.name
+    detailGenre.Text=item.genre:upper()
+    detailDescription.Text=item.description
+    detailId.Text="Place ID: "..tostring(item.id)
+    detailImage.Image="rbxthumb://type=GameIcon&id="..tostring(item.id).."&w=512&h=512"
+    detailFavorite.Text=favorites[item.name] and "★  REMOVE FROM FAVORITES" or "☆  ADD TO FAVORITES"
+    details.Visible=true
+    details.Position=UDim2.fromScale(1,0)
+    tween(details,.28,{Position=UDim2.fromScale(0,0)})
 
-    -- Clear previous dynamic buttons
-    for _, child in ipairs(details:GetChildren()) do
-        if child.Name == "ScriptButton" or child.Name == "CustomFrame" then
-            child:Destroy()
-        end
-    end
+    local existingScriptBtn = details:FindFirstChild("ScriptButton")
+    if existingScriptBtn then existingScriptBtn:Destroy() end
 
-    local yPos = 470
-
-    -- Official mapped script button
     local scriptUrl = scriptURLs[item.name]
+    
+    -- If the game HAS a script, show green button
     if scriptUrl then
         local scriptBtn = make("TextButton", {
-            Name = "ScriptButton", Text = "LOAD SCRIPT (KEYLESS)", TextSize = 11, TextColor3 = THEME.white,
+            Name = "ScriptButton", Text = "LOAD SCRIPT", TextSize = 11, TextColor3 = THEME.white,
             Font = Enum.Font.GothamBold, BackgroundColor3 = THEME.green,
-            Position = UDim2.fromOffset(19, yPos), Size = UDim2.new(1, -38, 0, 39), ZIndex = 21
+            Position = UDim2.fromOffset(19, 470), Size = UDim2.new(1, -38, 0, 39), ZIndex = 21
         }, details)
         corner(scriptBtn, 9)
 
         scriptBtn.MouseButton1Click:Connect(function()
-            scriptBtn.Text = "LOADING..."
-            scriptBtn.BackgroundColor3 = THEME.purpleDark
-            local success, err = pcall(function()
-                loadstring(game:HttpGet(scriptUrl))()
-            end)
+            scriptBtn.Text = "LOADING..."; scriptBtn.BackgroundColor3 = THEME.purpleDark
+            local success, err = pcall(function() loadstring(game:HttpGet(scriptUrl))() end)
             if success then
-                scriptBtn.Text = "SCRIPT LOADED!"
-                scriptBtn.BackgroundColor3 = THEME.green
+                scriptBtn.Text = "SCRIPT LOADED!"; scriptBtn.BackgroundColor3 = THEME.green
             else
-                scriptBtn.Text = "FAILED - TRY AGAIN"
-                scriptBtn.BackgroundColor3 = THEME.red
-                warn("Lumina script load failed:", err)
+                scriptBtn.Text = "FAILED - TRY AGAIN"; scriptBtn.BackgroundColor3 = THEME.red
+                warn("Lumina script load failed: ", err)
             end
-            task.delay(2.5, function()
-                if scriptBtn and scriptBtn.Parent then
-                    scriptBtn.Text = "LOAD SCRIPT (KEYLESS)"
-                    scriptBtn.BackgroundColor3 = THEME.green
-                end
+            task.delay(2, function()
+                if scriptBtn and scriptBtn.Parent then scriptBtn.Text = "LOAD SCRIPT"; scriptBtn.BackgroundColor3 = THEME.green end
             end)
         end)
-        yPos = yPos + 50
+        
+    -- If the game does NOT have a script, show the red broken button
     else
         local noScriptBtn = make("TextButton", {
-            Name = "ScriptButton", Text = "NO PUBLIC KEYLESS SCRIPT", TextSize = 11, TextColor3 = THEME.white,
+            Name = "ScriptButton", Text = "BROKEN OR UNKNOWN", TextSize = 11, TextColor3 = THEME.white,
             Font = Enum.Font.GothamBold, BackgroundColor3 = THEME.red,
-            Position = UDim2.fromOffset(19, yPos), Size = UDim2.new(1, -38, 0, 39), ZIndex = 21
+            Position = UDim2.fromOffset(19, 470), Size = UDim2.new(1, -38, 0, 39), ZIndex = 21
         }, details)
         corner(noScriptBtn, 9)
-        yPos = yPos + 50
     end
-
-    -- ========== CUSTOM SCRIPT SECTION ==========
-    local customFrame = make("Frame", {
-        Name = "CustomFrame",
-        Position = UDim2.fromOffset(19, yPos),
-        Size = UDim2.new(1, -38, 0, 160),
-        BackgroundColor3 = THEME.panel,
-        ZIndex = 21
-    }, details)
-    corner(customFrame, 10)
-    stroke(customFrame, THEME.line, 0.35)
-
-    local customTitle = label(customFrame, "CUSTOM SCRIPT (Paste your own)", 12, THEME.white, Enum.Font.GothamBold)
-    customTitle.Position = UDim2.fromOffset(12, 8)
-    customTitle.Size = UDim2.new(1, -24, 0, 22)
-
-    local customBox = make("TextBox", {
-        Position = UDim2.fromOffset(12, 36),
-        Size = UDim2.new(1, -24, 0, 50),
-        BackgroundColor3 = THEME.bg,
-        Text = customScripts[item.name] or "",
-        PlaceholderText = "Paste loadstring(...) or raw URL here...",
-        PlaceholderColor3 = THEME.muted,
-        TextColor3 = THEME.white,
-        TextSize = 11,
-        Font = Enum.Font.Gotham,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        TextYAlignment = Enum.TextYAlignment.Top,
-        ClearTextOnFocus = false,
-        MultiLine = true,
-        TextWrapped = true,
-        ZIndex = 22
-    }, customFrame)
-    corner(customBox, 6)
-
-    local loadCustomBtn = make("TextButton", {
-        Text = "LOAD CUSTOM",
-        TextSize = 11,
-        TextColor3 = THEME.white,
-        Font = Enum.Font.GothamBold,
-        BackgroundColor3 = THEME.purpleDark,
-        Position = UDim2.fromOffset(12, 96),
-        Size = UDim2.new(0.48, -6, 0, 34),
-        ZIndex = 22
-    }, customFrame)
-    corner(loadCustomBtn, 8)
-
-    local saveCustomBtn = make("TextButton", {
-        Text = "SAVE FOR GAME",
-        TextSize = 11,
-        TextColor3 = THEME.white,
-        Font = Enum.Font.GothamBold,
-        BackgroundColor3 = THEME.card,
-        Position = UDim2.new(0.52, 6, 0, 96),
-        Size = UDim2.new(0.48, -18, 0, 34),
-        ZIndex = 22
-    }, customFrame)
-    corner(saveCustomBtn, 8)
-
-    local statusLabel = label(customFrame, "", 10, THEME.muted)
-    statusLabel.Position = UDim2.fromOffset(12, 136)
-    statusLabel.Size = UDim2.new(1, -24, 0, 18)
-
-    loadCustomBtn.MouseButton1Click:Connect(function()
-        local text = customBox.Text:gsub("^%s*(.-)%s*$", "%1") -- trim
-        if text == "" then
-            statusLabel.Text = "Paste something first"
-            statusLabel.TextColor3 = THEME.red
-            return
-        end
-
-        loadCustomBtn.Text = "LOADING..."
-        loadCustomBtn.BackgroundColor3 = THEME.purple
-
-        local success, err = pcall(function()
-            if text:find("loadstring") or text:find("HttpGet") then
-                -- Full loadstring provided
-                loadstring(text)()
-            else
-                -- Assume it's a raw URL
-                loadstring(game:HttpGet(text))()
-            end
-        end)
-
-        if success then
-            loadCustomBtn.Text = "LOADED!"
-            loadCustomBtn.BackgroundColor3 = THEME.green
-            statusLabel.Text = "Custom script executed successfully"
-            statusLabel.TextColor3 = THEME.green
-        else
-            loadCustomBtn.Text = "FAILED"
-            loadCustomBtn.BackgroundColor3 = THEME.red
-            statusLabel.Text = "Error: " .. tostring(err):sub(1, 60)
-            statusLabel.TextColor3 = THEME.red
-            warn("Custom script error:", err)
-        end
-
-        task.delay(2.5, function()
-            if loadCustomBtn and loadCustomBtn.Parent then
-                loadCustomBtn.Text = "LOAD CUSTOM"
-                loadCustomBtn.BackgroundColor3 = THEME.purpleDark
-            end
-        end)
-    end)
-
-    saveCustomBtn.MouseButton1Click:Connect(function()
-        local text = customBox.Text:gsub("^%s*(.-)%s*$", "%1")
-        if text == "" then
-            statusLabel.Text = "Nothing to save"
-            statusLabel.TextColor3 = THEME.red
-            return
-        end
-        customScripts[item.name] = text
-        saveCustomBtn.Text = "SAVED!"
-        saveCustomBtn.BackgroundColor3 = THEME.green
-        statusLabel.Text = "Saved for " .. item.name .. " (this session)"
-        statusLabel.TextColor3 = THEME.green
-        task.delay(1.8, function()
-            if saveCustomBtn and saveCustomBtn.Parent then
-                saveCustomBtn.Text = "SAVE FOR GAME"
-                saveCustomBtn.BackgroundColor3 = THEME.card
-            end
-        end)
-    end)
 end
 
 local function makeCard(item, order)
@@ -604,13 +382,10 @@ render=function()
     local count=0
     for _,item in ipairs(catalog) do
         local searchable=string.lower(item.name.." "..item.genre)
-        local queryMatch=searchQuery=="" or string.find(searchable,searchQuery,1,true)\~=nil
+        local queryMatch=searchQuery=="" or string.find(searchable,searchQuery,1,true)~=nil
         local categoryMatch=activeCategory=="All" or item.genre==activeCategory
-        local favoriteMatch=currentPage\~="Favorites" or favorites[item.name]==true
-        if queryMatch and categoryMatch and favoriteMatch then
-            count = count + 1
-            makeCard(item,count)
-        end
+        local favoriteMatch=currentPage~="Favorites" or favorites[item.name]==true
+        if queryMatch and categoryMatch and favoriteMatch then count+=1; makeCard(item,count) end
     end
     if count==0 then
         local empty=label(cards,currentPage=="Favorites" and "No favorites yet — tap ☆ on a game card." or "No games found. Try another search.",12,THEME.muted)
@@ -627,12 +402,13 @@ for _,name in ipairs(categoryNames) do
     b.MouseButton1Click:Connect(function() activeCategory=name; render() end)
 end
 
+-- NAVIGATION (Updated with Universal Tab)
 local navEntries={{"Home","⌂"},{"Games","▦"},{"Universal","⚡"},{"Favorites","☆"},{"Settings","⚙"}}
 local function navigate(page)
     currentPage=page; details.Visible=false
-    searchFrame.Visible=page\~="Settings" and page\~="Universal"
-    categories.Visible=page\~="Settings" and page\~="Universal"
-    cards.Visible=page\~="Settings" and page\~="Universal"
+    searchFrame.Visible=page~="Settings" and page~="Universal"
+    categories.Visible=page~="Settings" and page~="Universal"
+    cards.Visible=page~="Settings" and page~="Universal"
     settingsPanel.Visible=page=="Settings"
     universalPanel.Visible=page=="Universal"
     
@@ -713,7 +489,7 @@ UserInputService.InputEnded:Connect(function(input)
     if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then dragging=false end
 end)
 
--- INITIALIZATION
+-- INITIALIZATION & LOADING SEQUENCE
 navigate("Home")
 render()
 
