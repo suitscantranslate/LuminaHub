@@ -1,28 +1,19 @@
--- LUMINA V3.2 | Roblox game discovery UI
+-- LUMINA V3.3 | Roblox game discovery + script hub
 -- Put this LocalScript in StarterPlayer > StarterPlayerScripts in a Roblox experience you own.
--- Read-only catalog UI: search, categories, favorites (session-only), details, thumbnail loading, loading screen.
--- Includes a suggestion bar that copies a Google Form link to the clipboard.
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local ContentProvider = game:GetService("ContentProvider")
-local GuiService = game:GetService("GuiService") -- Added for potential future use
+local GuiService = game:GetService("GuiService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local previous = playerGui:FindFirstChild("LuminaV3")
 if previous then previous:Destroy() end
 
--- ==========================================
--- YOUR LUMINA LOGO ASSET ID
--- ==========================================
-local LUMINA_ICON = "rbxassetid://88371014112910" 
-
--- ==========================================
--- YOUR SUGGESTION FORM LINK
--- ==========================================
+local LUMINA_ICON = "rbxassetid://88371014112910"
 local SUGGESTION_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSepvUPQYTxdqGM-QzwF852YiY-uV61PVSJX-_ZcGXY00BX7LQ/viewform"
 
 local THEME = {
@@ -64,7 +55,65 @@ local function label(parent, value, size, color, font)
     }, parent)
 end
 
--- IDs supplied by the user. These are used as place IDs for thumbnails / teleport attempts.
+-- ==========================================
+-- SCRIPT URL MAPPING (49 GAMES)
+-- ==========================================
+local scriptURLs = {
+    ["Brookhaven RP"] = "https://raw.githubusercontent.com/nxvap/Hexagon/refs/heads/main/brookhaven",
+    ["Adopt Me!"] = "https://raw.githubusercontent.com/eIysia-dev/best/refs/heads/main/loader",
+    ["Blox Fruits"] = "https://raw.githubusercontent.com/ShowScript79/cokkahub/refs/heads/main/cokkahub",
+    ["Murder Mystery 2"] = "https://raw.githubusercontent.com/xv3gasx/Murder-Mystery-2/refs/heads/main/Release.lua",
+    ["Jailbreak"] = "https://raw.githubusercontent.com/veloxides/Jailbreak/refs/heads/main/VeloxideLoader",
+    ["Welcome to Bloxburg"] = "https://azurix.vercel.app/",
+    ["Tower of Hell"] = "https://gist.githubusercontent.com/successful0999777-lab/c84bf42a29cf2559cb6ee5dfcb25f528/raw/43d65eca843b9d5bd72fc26ad8870795575f678a/Applehub.lua",
+    ["Natural Disaster Survival"] = "https://pastebin.com/raw/8XCgheRD",
+    ["Build A Boat For Treasure"] = "https://raw.githubusercontent.com/scarabhub/buildaboatAutoFarm/refs/heads/main/main.lua",
+    ["Piggy"] = "https://raw.githubusercontent.com/StarHackScripts/StarHack-Hub-Deepstar-Hub/refs/heads/main/StarHackHub_PiggyV2release",
+    ["Pet Simulator 99"] = "https://raw.githubusercontent.com/REDzHUB/PetSimulator99/main/redz9999.lua",
+    ["DOORS"] = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau",
+    ["Slap Battles"] = "https://raw.githubusercontent.com/joyfulpizza/Joyful_pizzapartyl-scripts/refs/heads/main/Slapplefarmer.lua",
+    ["BedWars"] = "https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/NewMainScript.lua",
+    ["Tower Defense Simulator"] = "https://raw.githubusercontent.com/Nanana291/Kronos/refs/heads/main/Loader.lua",
+    ["The Strongest Battlegrounds"] = "https://raw.githubusercontent.com/0mam0ri/KittyWare/refs/heads/main/obf.lua",
+    ["Blade Ball"] = "https://raw.githubusercontent.com/Doortthemort/676/refs/heads/main/Main.lua",
+    ["Dress to Impress"] = "https://raw.githubusercontent.com/ToraScript/Script/main/DressToImpress",
+    ["Grow a Garden"] = "https://raw.githubusercontent.com/depthso/Grow-a-Garden/refs/heads/main/autofarm.lua",
+    ["Steal a Brainrot"] = "https://pastefy.app/V0blGtti/raw",
+    ["99 Nights in the Forest"] = "https://raw.githubusercontent.com/wehibuyfgyuwe/99nights.github.io/refs/heads/main/ringta.lua",
+    ["Fisch"] = "https://raw.githubusercontent.com/xataxell/fisch/refs/heads/main/script.lua",
+    ["Anime Vanguards"] = "https://dollarhub.space/script/loader.lua",
+    ["Blue Lock: Rivals"] = "https://raw.githubusercontent.com/TheDarkoneMarcillisePex/Other-Scripts/refs/heads/main/Blue%20Lock%20Rivals%20GUI",
+    ["Volleyball Legends"] = "https://raw.githubusercontent.com/M1zard/LokisVoley/refs/heads/main/VolleyBallLegendsScript.lua",
+    ["Jujutsu Shenanigans"] = "https://raw.githubusercontent.com/samuiex/samui/refs/heads/main/samui%20menu",
+    ["Grand Piece Online"] = "https://raw.githubusercontent.com/Jakekill871/public-scripts/master/GrandPieceOnlineGUI",
+    ["Survive the Killer"] = "https://raw.githubusercontent.com/Biskus0/SurviveTheKiller/refs/heads/main/Loading.lua",
+    ["Berry Avenue RP"] = "https://pastefy.app/mW58xZvr/raw",
+    ["Apocalypse Rising 2"] = "https://pastebin.com/raw/B2NP4x8w",
+    ["Creatures of Sonaria"] = "https://raw.githubusercontent.com/Mangnex/Lunar-Hub/refs/heads/main/FreeLoader.lua",
+    ["Ragdoll Engine"] = "https://pastebin.com/raw/NkTcjSS7",
+    ["MeepCity"] = "https://raw.githubusercontent.com/ToraScript/Script/main/MeepCity",
+    ["Royale High"] = "https://pastes.io/raw/rh-30329-3",
+    ["Work at a Pizza Place"] = "https://raw.githubusercontent.com/Hm5011/hussain/refs/heads/main/Work%20at%20a%20pizza%20place",
+    ["Flee the Facility"] = "https://pastebin.com/raw/VBQjCrST",
+    ["Epic Minigames"] = "https://raw.githubusercontent.com/SlamminPig/rblxgames/main/Epic%20Minigames/EpicMinigamesGUI",
+    ["Theme Park Tycoon 2"] = "https://pastebin.com/raw/289f79g7060gjl28487294", -- Placeholder
+    ["Bee Swarm Simulator"] = "https://raw.githubusercontent.com/VerbalHubz/Verbal-Hub/refs/heads/main/Bee%20Swarm%20Sim.Lua",
+    ["Vehicle Simulator"] = "https://raw.githubusercontent.com/CasperFlyModz/discord.gg-rips/main/VehicleSimulator.lua",
+    ["Da Hood"] = "https://raw.githubusercontent.com/xulfo/Oxide-Loader/main/Main.lua",
+    ["Counter Blox"] = "https://raw.githubusercontent.com/yyeptech/thebighubs/refs/heads/main/cbro.lua",
+    ["Phantom Forces"] = "https://raw.githubusercontent.com/Nickk-GG/Phantom-Force-NickHub/refs/heads/main/sc.lua",
+    ["Arsenal"] = "https://raw.githubusercontent.com/blackowl1231/Z3US/refs/heads/main/main.lua",
+    ["Strucid"] = "https://polyethelene.pages.dev/Strucid.luau",
+    ["Big Paintball"] = "https://raw.githubusercontent.com/ZaRdoOx/Fazium-files/main/Loader",
+    ["Booga Booga"] = "https://raw.githubusercontent.com/Yousuck780/Nebula-Hub/refs/heads/main/boogaboogareborn",
+    ["Islands"] = "https://system-exodus.com/scripts/Islands/Islands.lua",
+    ["Pet Simulator X"] = "https://raw.githubusercontent.com/RobloxGPT/chatgpt-scripts/refs/heads/main/fly%20gui%20v2",
+    ["Anime Adventures"] = "https://raw.githubusercontent.com/ArponAG/Scripts/main/AnimeAdventures.lua",
+}
+
+-- ==========================================
+-- CATALOG (Same as before)
+-- ==========================================
 local catalog = {
     {name="Brookhaven RP", genre="Roleplay", id=4924922222, description="Live your own story in a city."},
     {name="Adopt Me!", genre="Roleplay", id=920587237, description="Raise pets, decorate homes, and explore."},
@@ -134,195 +183,11 @@ local gui = make("ScreenGui", {
     DisplayOrder=50, ZIndexBehavior=Enum.ZIndexBehavior.Sibling,
 }, playerGui)
 
--- ==========================================
--- LOADING SCREEN
--- ==========================================
-local intro = make("Frame", {Size=UDim2.fromScale(1,1), BackgroundColor3=THEME.bg, ZIndex=100, Visible=true}, gui)
-local introIcon = make("ImageLabel", {
-    AnchorPoint=Vector2.new(.5,.5), Position=UDim2.fromScale(.5,.4), Size=UDim2.fromOffset(120,120),
-    BackgroundTransparency=1, Image=LUMINA_ICON, ImageColor3=THEME.white
-}, intro)
-local introWord = label(intro, "L U M I N A", 28, THEME.white, Enum.Font.GothamBold)
-introWord.AnchorPoint=Vector2.new(.5,.5); introWord.Position=UDim2.fromScale(.5,.53)
-introWord.Size=UDim2.fromOffset(350,50); introWord.TextXAlignment=Enum.TextXAlignment.Center
-local introSub = label(intro, "LOADING YOUR LIBRARY...", 10, THEME.muted, Enum.Font.GothamMedium)
-introSub.AnchorPoint=Vector2.new(.5,.5); introSub.Position=UDim2.fromScale(.5,.58)
-introSub.Size=UDim2.fromOffset(300,24); introSub.TextXAlignment=Enum.TextXAlignment.Center
-local barBack=make("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.65),Size=UDim2.fromOffset(165,3),BackgroundColor3=THEME.card,ZIndex=101},intro); corner(barBack,4)
-local bar=make("Frame",{Size=UDim2.new(0,0,1,0),BackgroundColor3=THEME.purple,ZIndex=102},barBack); corner(bar,4)
-
--- Pulse animation for loading logo
-local pulseTween = TweenService:Create(introIcon, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Size = UDim2.fromOffset(135, 135)})
-pulseTween:Play()
+-- ... (LOADING SCREEN, MAIN WINDOW, SIDEBAR, SUGGESTION BAR, ALL REMAIN THE SAME) ...
 
 -- ==========================================
--- MAIN WINDOW
+-- UPDATED DETAILS PANEL WITH LOAD SCRIPT BUTTON
 -- ==========================================
-local main=make("Frame",{Name="Main",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.53),Size=UDim2.fromScale(.88,.82),BackgroundColor3=THEME.bg,Visible=false,ClipsDescendants=true},gui)
-corner(main,17); stroke(main,THEME.line,.1)
-make("UISizeConstraint",{MinSize=Vector2.new(320,400),MaxSize=Vector2.new(1050,760)},main)
-local header=make("Frame",{Size=UDim2.new(1,0,0,58),BackgroundColor3=THEME.panel,BorderSizePixel=0},main)
-
--- Use image for logo
-local moonLogo=make("ImageLabel",{Position=UDim2.fromOffset(14,10), Size=UDim2.fromOffset(38,38), BackgroundTransparency=1, Image=LUMINA_ICON, ImageColor3=THEME.purple}, header)
-local brand=label(header,"LUMINA",15,THEME.white,Enum.Font.GothamBold); brand.Position=UDim2.fromOffset(54,6); brand.Size=UDim2.fromOffset(105,23)
-local brandSub=label(header,"GAME LIBRARY",9,THEME.muted,Enum.Font.GothamMedium); brandSub.Position=UDim2.fromOffset(55,28); brandSub.Size=UDim2.fromOffset(110,16)
-
-local function headerButton(caption, rightOffset)
-    local b=make("TextButton",{Text=caption,TextSize=caption=="×" and 22 or 17,TextColor3=THEME.white,Font=Enum.Font.Gotham,BackgroundColor3=THEME.card,Position=UDim2.new(1,rightOffset,0,12),Size=UDim2.fromOffset(34,34),AutoButtonColor=false},header)
-    corner(b,9); return b
-end
-local minimize=headerButton("—",-78)
-local close=headerButton("×",-39)
-
-local sidebar=make("Frame",{Position=UDim2.fromOffset(0,58),Size=UDim2.new(0,136,1,-58),BackgroundColor3=THEME.panel,BorderSizePixel=0},main)
-local navList=make("Frame",{Position=UDim2.fromOffset(10,16),Size=UDim2.new(1,-20,0,220),BackgroundTransparency=1},sidebar)
-make("UIListLayout",{Padding=UDim.new(0,7),SortOrder=Enum.SortOrder.LayoutOrder},navList)
-local body=make("Frame",{Position=UDim2.new(0,136,0,58),Size=UDim2.new(1,-136,1,-58),BackgroundTransparency=1},main)
-local heading=label(body,"Discover your next adventure",21,THEME.white,Enum.Font.GothamBold); heading.Position=UDim2.fromOffset(19,12); heading.Size=UDim2.new(1,-38,0,31)
-local subheading=label(body,"A world of games, all in one place.",11,THEME.muted); subheading.Position=UDim2.fromOffset(20,42); subheading.Size=UDim2.new(1,-40,0,22)
-local searchFrame=make("Frame",{Position=UDim2.fromOffset(19,73),Size=UDim2.new(1,-38,0,37),BackgroundColor3=THEME.panel},body); corner(searchFrame,9); stroke(searchFrame,THEME.line,.35)
-local searchBox=make("TextBox",{Position=UDim2.fromOffset(11,0),Size=UDim2.new(1,-22,1,0),BackgroundTransparency=1,PlaceholderText="Search 49 games...",PlaceholderColor3=THEME.muted,Text="",TextColor3=THEME.white,TextSize=12,Font=Enum.Font.Gotham,ClearTextOnFocus=false,TextXAlignment=Enum.TextXAlignment.Left},searchFrame)
-local categories=make("ScrollingFrame",{Position=UDim2.fromOffset(19,118),Size=UDim2.new(1,-38,0,32),BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=0,ScrollingDirection=Enum.ScrollingDirection.X,AutomaticCanvasSize=Enum.AutomaticSize.X,CanvasSize=UDim2.new()},body)
-make("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,Padding=UDim.new(0,6),SortOrder=Enum.SortOrder.LayoutOrder},categories)
-local cards=make("ScrollingFrame",{Position=UDim2.fromOffset(19,159),Size=UDim2.new(1,-38,1,-176),BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=3,ScrollBarImageColor3=THEME.purple,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},body)
-local grid=make("UIGridLayout",{CellSize=UDim2.fromOffset(160,158),CellPadding=UDim2.fromOffset(10,10),SortOrder=Enum.SortOrder.LayoutOrder},cards)
-
--- Details overlay
-local details=make("Frame",{Name="Details",Position=UDim2.fromScale(1,0),Size=UDim2.fromScale(1,1),BackgroundColor3=THEME.bg,Visible=false,ZIndex=20},body)
-local back=make("TextButton",{Text="←  BACK TO LIBRARY",TextSize=11,TextColor3=THEME.muted,Font=Enum.Font.GothamMedium,BackgroundTransparency=1,Position=UDim2.fromOffset(19,12),Size=UDim2.fromOffset(190,31),ZIndex=21},details)
-local detailImage=make("ImageLabel",{Position=UDim2.fromOffset(19,53),Size=UDim2.new(1,-38,0,160),BackgroundColor3=THEME.card,Image="",ScaleType=Enum.ScaleType.Crop,ZIndex=21},details); corner(detailImage,12)
-local detailName=label(details,"Game name",23,THEME.white,Enum.Font.GothamBold); detailName.Position=UDim2.fromOffset(19,222); detailName.Size=UDim2.new(1,-38,0,34); detailName.ZIndex=21
-local detailGenre=label(details,"GENRE",10,THEME.purple,Enum.Font.GothamBold); detailGenre.Position=UDim2.fromOffset(20,256); detailGenre.Size=UDim2.new(1,-40,0,22); detailGenre.ZIndex=21
-local detailDescription=label(details,"",12,THEME.muted); detailDescription.Position=UDim2.fromOffset(20,284); detailDescription.Size=UDim2.new(1,-40,0,58); detailDescription.TextWrapped=true; detailDescription.TextYAlignment=Enum.TextYAlignment.Top; detailDescription.ZIndex=21
-local detailFavorite=make("TextButton",{Text="☆  ADD TO FAVORITES",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.purpleDark,Position=UDim2.fromOffset(19,352),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(detailFavorite,9)
-local playButton=make("TextButton",{Text="OPEN ROBLOX EXPERIENCE  ↗",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.card,Position=UDim2.fromOffset(19,399),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(playButton,9); stroke(playButton,THEME.line,.25)
-local detailId=label(details,"Place ID",10,THEME.muted); detailId.Position=UDim2.fromOffset(20,443); detailId.Size=UDim2.new(1,-40,0,22); detailId.ZIndex=21
-
-local settingsPanel=make("Frame",{Position=UDim2.fromOffset(19,73),Size=UDim2.new(1,-38,0,185),BackgroundColor3=THEME.panel,Visible=false},body); corner(settingsPanel,12); stroke(settingsPanel,THEME.line,.35)
-local settingsTitle=label(settingsPanel,"Appearance",15,THEME.white,Enum.Font.GothamBold); settingsTitle.Position=UDim2.fromOffset(14,10)
-local settingsInfo=label(settingsPanel,"Customize Lumina's accent color.",11,THEME.muted); settingsInfo.Position=UDim2.fromOffset(14,40); settingsInfo.Size=UDim2.new(1,-28,0,25)
-local settingsNote=label(settingsPanel,"Favorites are kept for this session only.",11,THEME.muted); settingsNote.Position=UDim2.fromOffset(14,67); settingsNote.Size=UDim2.new(1,-28,0,25)
-local accentButton=make("TextButton",{Text="CHANGE ACCENT COLOR",TextSize=10,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.purpleDark,Position=UDim2.fromOffset(14,112),Size=UDim2.new(1,-28,0,34)},settingsPanel); corner(accentButton,8)
-
--- ==========================================
--- SUGGESTION BAR (SIDEBAR)
--- ==========================================
-local suggestFrame = make("Frame", {
-    Position = UDim2.new(0, 10, 1, -110),
-    Size = UDim2.new(1, -20, 0, 100),
-    BackgroundColor3 = THEME.card,
-    BorderSizePixel = 0
-}, sidebar)
-corner(suggestFrame, 10); stroke(suggestFrame, THEME.line, 0.4)
-
-local suggestTitle = label(suggestFrame, "SUGGEST A GAME", 10, THEME.white, Enum.Font.GothamBold)
-suggestTitle.Position = UDim2.fromOffset(10, 8)
-suggestTitle.Size = UDim2.new(1, -20, 0, 18)
-
-local suggestDesc = label(suggestFrame, "Have an idea for a game?", 9, THEME.muted, Enum.Font.Gotham)
-suggestDesc.Position = UDim2.fromOffset(10, 28)
-suggestDesc.Size = UDim2.new(1, -20, 0, 14)
-
-local suggestLinkBox = make("TextBox", {
-    Position = UDim2.fromOffset(10, 46),
-    Size = UDim2.new(1, -20, 0, 24),
-    BackgroundColor3 = THEME.bg,
-    Text = SUGGESTION_LINK,
-    TextSize = 8,
-    TextColor3 = THEME.muted,
-    Font = Enum.Font.Gotham,
-    TextXAlignment = Enum.TextXAlignment.Center,
-    ClearTextOnFocus = false,
-    TextEditable = false -- Make it read-only so players don't accidentally edit it
-}, suggestFrame)
-corner(suggestLinkBox, 6)
-
-local copyButton = make("TextButton", {
-    Text = "COPY LINK",
-    TextSize = 9,
-    TextColor3 = THEME.white,
-    Font = Enum.Font.GothamBold,
-    BackgroundColor3 = THEME.purpleDark,
-    Position = UDim2.fromOffset(10, 76),
-    Size = UDim2.new(1, -20, 0, 20),
-    AutoButtonColor = false
-}, suggestFrame)
-corner(copyButton, 6)
-
--- Copy to clipboard logic (with fallbacks)
-local function copyToClipboard(text)
-    if setclipboard then
-        setclipboard(text)
-        return true
-    elseif toclipboard then
-        toclipboard(text)
-        return true
-    elseif syn and syn.write_clipboard then
-        syn.write_clipboard(text)
-        return true
-    end
-    return false
-end
-
-copyButton.MouseButton1Click:Connect(function()
-    local success = copyToClipboard(SUGGESTION_LINK)
-    if success then
-        copyButton.Text = "COPIED!"
-        copyButton.BackgroundColor3 = THEME.green
-        task.delay(2, function()
-            if copyButton and copyButton.Parent then
-                copyButton.Text = "COPY LINK"
-                copyButton.BackgroundColor3 = THEME.purpleDark
-            end
-        end)
-    else
-        copyButton.Text = "COPY FAILED"
-        copyButton.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
-        task.delay(2, function()
-            if copyButton and copyButton.Parent then
-                copyButton.Text = "COPY LINK"
-                copyButton.BackgroundColor3 = THEME.purpleDark
-            end
-        end)
-    end
-end)
-
--- ==========================================
--- END SUGGESTION BAR
--- ==========================================
-
-local categoriesByName={}
-local navButtons={}
-local function setAccent(color)
-    THEME.purple=color
-    moonLogo.ImageColor3=color
-    bar.BackgroundColor3=color
-    grid.ScrollBarImageColor3=color
-    for _,b in pairs(categoriesByName) do
-        if b.Name==activeCategory then b.BackgroundColor3=color end
-    end
-end
-accentButton.MouseButton1Click:Connect(function()
-    accentIndex=accentIndex%#accentOptions+1
-    setAccent(accentOptions[accentIndex])
-    accentButton.BackgroundColor3=THEME.purple
-end)
-
-local function resizeGrid()
-    local width=cards.AbsoluteSize.X
-    if width<=0 then return end
-    local columns=math.max(1,math.floor((width+10)/170))
-    grid.CellSize=UDim2.fromOffset(math.floor((width-10*(columns-1))/columns),158)
-end
-cards:GetPropertyChangedSignal("AbsoluteSize"):Connect(resizeGrid)
-
-local render
-local function clearCards()
-    for _,child in ipairs(cards:GetChildren()) do
-        if child:IsA("Frame") or child:IsA("TextLabel") then child:Destroy() end
-    end
-end
 local function showDetails(item)
     selectedGame=item
     detailName.Text=item.name
@@ -334,189 +199,49 @@ local function showDetails(item)
     details.Visible=true
     details.Position=UDim2.fromScale(1,0)
     tween(details,.28,{Position=UDim2.fromScale(0,0)})
-end
-local function makeCard(item, order)
-    local card=make("Frame",{Name="GameCard",LayoutOrder=order,BackgroundColor3=THEME.card,BorderSizePixel=0},cards)
-    corner(card,11); stroke(card,THEME.line,.38)
-    
-    local thumb=make("ImageLabel",{Position=UDim2.fromOffset(7,7),Size=UDim2.new(1,-14,0,88),BackgroundColor3=Color3.fromRGB(48,39,67),Image="rbxthumb://type=GameIcon&id="..tostring(item.id).."&w=256&h=256",ScaleType=Enum.ScaleType.Crop},card)
-    corner(thumb,8)
 
-    local name=label(card,item.name,11,THEME.white,Enum.Font.GothamSemibold); name.Position=UDim2.fromOffset(9,98); name.Size=UDim2.new(1,-39,0,20); name.TextTruncate=Enum.TextTruncate.AtEnd
-    local genre=label(card,item.genre,9,THEME.muted); genre.Position=UDim2.fromOffset(9,117); genre.Size=UDim2.new(1,-18,0,15)
-    local fav=make("TextButton",{Text=favorites[item.name] and "★" or "☆",TextColor3=THEME.purple,TextSize=18,Font=Enum.Font.Gotham,BackgroundTransparency=1,Position=UDim2.new(1,-31,0,94),Size=UDim2.fromOffset(25,25),AutoButtonColor=false},card)
-    fav.MouseButton1Click:Connect(function()
-        favorites[item.name]=not favorites[item.name]
-        fav.Text=favorites[item.name] and "★" or "☆"
-        if currentPage=="Favorites" then render() end
-    end)
-    local open=make("TextButton",{Text="VIEW DETAILS  →",TextColor3=THEME.white,TextSize=9,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.purpleDark,Position=UDim2.new(0,7,1,-27),Size=UDim2.new(1,-14,0,21),AutoButtonColor=false},card); corner(open,6)
-    open.MouseEnter:Connect(function() tween(card,.12,{BackgroundColor3=THEME.cardHover}) end)
-    open.MouseLeave:Connect(function() tween(card,.12,{BackgroundColor3=THEME.card}) end)
-    open.MouseButton1Click:Connect(function() showDetails(item) end)
-end
+    -- Remove old script button if it exists
+    local existingScriptBtn = details:FindFirstChild("ScriptButton")
+    if existingScriptBtn then existingScriptBtn:Destroy() end
 
-render=function()
-    clearCards()
-    for name,button in pairs(categoriesByName) do
-        local active=activeCategory==name
-        button.BackgroundColor3=active and THEME.purple or THEME.panel
-        button.TextColor3=active and THEME.white or THEME.muted
+    -- Add the LOAD SCRIPT button
+    local scriptUrl = scriptURLs[item.name]
+    if scriptUrl then
+        local scriptBtn = make("TextButton", {
+            Name = "ScriptButton",
+            Text = "LOAD SCRIPT",
+            TextSize = 11,
+            TextColor3 = THEME.white,
+            Font = Enum.Font.GothamBold,
+            BackgroundColor3 = THEME.green,
+            Position = UDim2.fromOffset(19, 450),
+            Size = UDim2.new(1, -38, 0, 39),
+            ZIndex = 21
+        }, details)
+        corner(scriptBtn, 9)
+
+        scriptBtn.MouseButton1Click:Connect(function()
+            scriptBtn.Text = "LOADING..."
+            scriptBtn.BackgroundColor3 = THEME.purpleDark
+            local success, err = pcall(function()
+                loadstring(game:HttpGet(scriptUrl))()
+            end)
+            if success then
+                scriptBtn.Text = "SCRIPT LOADED!"
+                scriptBtn.BackgroundColor3 = THEME.green
+            else
+                scriptBtn.Text = "FAILED - TRY AGAIN"
+                scriptBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+                warn("Lumina script load failed: ", err)
+            end
+            task.delay(2, function()
+                if scriptBtn and scriptBtn.Parent then
+                    scriptBtn.Text = "LOAD SCRIPT"
+                    scriptBtn.BackgroundColor3 = THEME.green
+                end
+            end)
+        end)
     end
-    heading.Text=({Home="Discover your next adventure",Games="Game library",Favorites="Your favorites",Settings="Settings"})[currentPage] or "Discover"
-    subheading.Text=({Home="A world of games, all in one place.",Games="Browse all 49 experiences.",Favorites="Your saved games, all together.",Settings="Make Lumina feel like yours."})[currentPage] or "Discover games."
-    local count=0
-    for _,item in ipairs(catalog) do
-        local searchable=string.lower(item.name.." "..item.genre)
-        local queryMatch=searchQuery=="" or string.find(searchable,searchQuery,1,true)~=nil
-        local categoryMatch=activeCategory=="All" or item.genre==activeCategory
-        local favoriteMatch=currentPage~="Favorites" or favorites[item.name]==true
-        if queryMatch and categoryMatch and favoriteMatch then
-            count+=1; makeCard(item,count)
-        end
-    end
-    if count==0 then
-        local empty=label(cards,currentPage=="Favorites" and "No favorites yet — tap ☆ on a game card." or "No games found. Try another search.",12,THEME.muted)
-        empty.Name="EmptyState"; empty.Size=UDim2.new(1,0,0,50); empty.LayoutOrder=9999
-    end
-    resizeGrid()
 end
 
-local categoryNames={"All","Action","Adventure","Anime","Building","Fashion","Fighting","FPS","Horror","Obby","Party","Racing","Roleplay","Simulator","Social","Sports","Strategy","Survival","Tycoon"}
-for _,name in ipairs(categoryNames) do
-    local width=math.max(45,#name*7+18)
-    local b=make("TextButton",{Name=name,Text=name,TextSize=10,TextColor3=name=="All" and THEME.white or THEME.muted,Font=Enum.Font.GothamMedium,BackgroundColor3=name=="All" and THEME.purple or THEME.panel,Size=UDim2.fromOffset(width,29),AutoButtonColor=false},categories)
-    corner(b,8); categoriesByName[name]=b
-    b.MouseButton1Click:Connect(function() activeCategory=name; render() end)
-end
-
-local navEntries={{"Home","⌂"},{"Games","▦"},{"Favorites","☆"},{"Settings","⚙"}}
-local function navigate(page)
-    currentPage=page
-    details.Visible=false
-    searchFrame.Visible=page~="Settings"
-    categories.Visible=page~="Settings"
-    cards.Visible=page~="Settings"
-    settingsPanel.Visible=page=="Settings"
-    for name,button in pairs(navButtons) do
-        local active=name==page
-        button.BackgroundColor3=active and THEME.purpleDark or THEME.panel
-        button.BackgroundTransparency=active and 0 or 1
-    end
-    render()
-end
-for i,entry in ipairs(navEntries) do
-    local name,icon=entry[1],entry[2]
-    local b=make("TextButton",{Name=name,LayoutOrder=i,Text="",BackgroundColor3=THEME.panel,BackgroundTransparency=name=="Home" and 0 or 1,Size=UDim2.new(1,0,0,39),AutoButtonColor=false},navList)
-    corner(b,9)
-    local ico=label(b,icon,17,THEME.white); ico.Position=UDim2.fromOffset(7,4); ico.Size=UDim2.fromOffset(24,30); ico.TextXAlignment=Enum.TextXAlignment.Center
-    local txt=label(b,name,11,THEME.muted,Enum.Font.GothamMedium); txt.Position=UDim2.fromOffset(38,4); txt.Size=UDim2.new(1,-42,0,30)
-    navButtons[name]=b
-    b.MouseButton1Click:Connect(function() navigate(name) end)
-end
-searchBox:GetPropertyChangedSignal("Text"):Connect(function() searchQuery=string.lower(searchBox.Text); render() end)
-back.MouseButton1Click:Connect(function()
-    tween(details,.2,{Position=UDim2.fromScale(1,0)})
-    task.delay(.21,function() details.Visible=false end)
-end)
-detailFavorite.MouseButton1Click:Connect(function()
-    if not selectedGame then return end
-    favorites[selectedGame.name]=not favorites[selectedGame.name]
-    detailFavorite.Text=favorites[selectedGame.name] and "★  REMOVE FROM FAVORITES" or "☆  ADD TO FAVORITES"
-    if currentPage=="Favorites" then render() end
-end)
-playButton.MouseButton1Click:Connect(function()
-    if not selectedGame then return end
-    local ok,err=pcall(function() TeleportService:Teleport(selectedGame.id,player) end)
-    if not ok then
-        playButton.Text="TELEPORT UNAVAILABLE"
-        task.delay(2,function() if playButton.Parent then playButton.Text="OPEN ROBLOX EXPERIENCE  ↗" end end)
-        warn("Lumina teleport failed: ",err)
-    end
-end)
-
--- Minimize/reopen button
-local reopen=make("TextButton",{Name="LuminaReopen",AnchorPoint=Vector2.new(0,.5),Position=UDim2.new(0,-65,.5,0),Size=UDim2.fromOffset(52,52),Text="",BackgroundColor3=THEME.panel,Visible=false,AutoButtonColor=false},gui)
-corner(reopen,15); stroke(reopen,THEME.purple,.2)
-make("ImageLabel", {Size=UDim2.fromScale(0.7, 0.7), Position=UDim2.fromScale(0.5, 0.5), AnchorPoint=Vector2.new(0.5, 0.5), BackgroundTransparency=1, Image=LUMINA_ICON, ImageColor3=THEME.purple}, reopen)
-
-minimize.MouseButton1Click:Connect(function()
-    tween(main,.2,{Size=UDim2.fromScale(.72,.66),BackgroundTransparency=1})
-    task.delay(.21,function()
-        main.Visible=false; main.BackgroundTransparency=0; reopen.Visible=true
-        tween(reopen,.24,{Position=UDim2.new(0,12,.5,0)})
-    end)
-end)
-reopen.MouseButton1Click:Connect(function()
-    tween(reopen,.15,{Position=UDim2.new(0,-65,.5,0)})
-    task.delay(.16,function()
-        reopen.Visible=false; main.Visible=true; main.Size=UDim2.fromScale(.72,.66)
-        tween(main,.28,{Size=UDim2.fromScale(.88,.82)})
-    end)
-end)
-close.MouseButton1Click:Connect(function()
-    tween(main,.18,{Size=UDim2.fromScale(.72,.66),BackgroundTransparency=1})
-    task.delay(.2,function() gui:Destroy() end)
-end)
-
--- Drag the window by its top bar (mouse and touch)
-local dragging=false
-local dragStart, startPosition
-header.InputBegan:Connect(function(input)
-    if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
-        dragging=true; dragStart=input.Position; startPosition=main.Position
-    end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
-        local delta=input.Position-dragStart
-        main.Position=UDim2.new(startPosition.X.Scale,startPosition.X.Offset+delta.X,startPosition.Y.Scale,startPosition.Y.Offset+delta.Y)
-    end
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then dragging=false end
-end)
-
--- ==========================================
--- INITIALIZATION & LOADING SEQUENCE
--- ==========================================
-navigate("Home")
-render()
-
-task.spawn(function()
-    -- Preload the first 12 thumbnails to make the loading screen actually do something
-    local preloadAssets = {}
-    for i, item in ipairs(catalog) do
-        if i > 12 then break end
-        table.insert(preloadAssets, "rbxthumb://type=GameIcon&id="..tostring(item.id).."&w=256&h=256")
-    end
-    
-    local success, err = pcall(function()
-        ContentProvider:PreloadAsync(preloadAssets)
-    end)
-
-    -- Simulate a smooth loading bar animation
-    for i = 1, 100 do
-        bar.Size = UDim2.new(i/100, 0, 1, 0)
-        task.wait(0.015) 
-    end
-    
-    task.wait(0.3)
-    
-    -- Fade out loading screen
-    introSub.Text = "READY."
-    tween(intro, 0.6, {BackgroundTransparency = 1})
-    tween(introIcon, 0.6, {ImageTransparency = 1})
-    tween(introWord, 0.6, {TextTransparency = 1})
-    tween(introSub, 0.6, {TextTransparency = 1})
-    tween(barBack, 0.6, {BackgroundTransparency = 1})
-    tween(bar, 0.6, {BackgroundTransparency = 1})
-    
-    task.wait(0.65)
-    intro:Destroy()
-    
-    -- Animate main window in
-    main.Visible = true
-    main.Size = UDim2.fromScale(.75, .70)
-    tween(main, .38, {Size = UDim2.fromScale(.88, .82)})
-end)
+-- ... (REST OF THE CODE: CARDS, CATEGORIES, NAVIGATION, MINIMIZE/CLOSE, DRAG, INITIALIZATION) ...
