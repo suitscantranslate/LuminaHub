@@ -1,7 +1,6 @@
--- LUMINA V3.3 | Roblox game discovery + script hub
+-- LUMINA V4.0 | Roblox game discovery + script hub
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local ContentProvider = game:GetService("ContentProvider")
 
@@ -53,58 +52,17 @@ local function label(parent, value, size, color, font)
     }, parent)
 end
 
--- SCRIPT URL MAPPING (Updated Blox Fruits)
+-- ==========================================
+-- SCRIPT URL MAPPING
+-- ==========================================
 local scriptURLs = {
-    ["Brookhaven RP"] = "https://raw.githubusercontent.com/nxvap/Hexagon/refs/heads/main/brookhaven",
-    ["Adopt Me!"] = "https://raw.githubusercontent.com/eIysia-dev/best/refs/heads/main/loader",
-    ["Blox Fruits"] = "https://raw.githubusercontent.com/REDzHUB/BloxFruits/main/redz9999.lua", -- Updated!
+    ["Blox Fruits"] = "https://raw.githubusercontent.com/REDzHUB/BloxFruits/main/redz9999.lua", -- Reliable
+    ["Arsenal"] = "https://raw.githubusercontent.com/blackowl1231/Z3US/refs/heads/main/main.lua",
+    ["BedWars"] = "https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/NewMainScript.lua",
+    ["Pet Simulator 99"] = "https://raw.githubusercontent.com/REDzHUB/PetSimulator99/main/redz9999.lua",
     ["Murder Mystery 2"] = "https://raw.githubusercontent.com/xv3gasx/Murder-Mystery-2/refs/heads/main/Release.lua",
     ["Jailbreak"] = "https://raw.githubusercontent.com/veloxides/Jailbreak/refs/heads/main/VeloxideLoader",
-    ["Welcome to Bloxburg"] = "https://azurix.vercel.app/",
-    ["Tower of Hell"] = "https://gist.githubusercontent.com/successful0999777-lab/c84bf42a29cf2559cb6ee5dfcb25f528/raw/43d65eca843b9d5bd72fc26ad8870795575f678a/Applehub.lua",
-    ["Natural Disaster Survival"] = "https://pastebin.com/raw/8XCgheRD",
-    ["Build A Boat For Treasure"] = "https://raw.githubusercontent.com/scarabhub/buildaboatAutoFarm/refs/heads/main/main.lua",
-    ["Piggy"] = "https://raw.githubusercontent.com/StarHackScripts/StarHack-Hub-Deepstar-Hub/refs/heads/main/StarHackHub_PiggyV2release",
-    ["Pet Simulator 99"] = "https://raw.githubusercontent.com/REDzHUB/PetSimulator99/main/redz9999.lua",
-    ["DOORS"] = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau",
-    ["Slap Battles"] = "https://raw.githubusercontent.com/joyfulpizza/Joyful_pizzapartyl-scripts/refs/heads/main/Slapplefarmer.lua",
-    ["BedWars"] = "https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/NewMainScript.lua",
-    ["Tower Defense Simulator"] = "https://raw.githubusercontent.com/Nanana291/Kronos/refs/heads/main/Loader.lua",
-    ["The Strongest Battlegrounds"] = "https://raw.githubusercontent.com/0mam0ri/KittyWare/refs/heads/main/obf.lua",
-    ["Blade Ball"] = "https://raw.githubusercontent.com/Doortthemort/676/refs/heads/main/Main.lua",
-    ["Dress to Impress"] = "https://raw.githubusercontent.com/ToraScript/Script/main/DressToImpress",
-    ["Grow a Garden"] = "https://raw.githubusercontent.com/depthso/Grow-a-Garden/refs/heads/main/autofarm.lua",
-    ["Steal a Brainrot"] = "https://pastefy.app/V0blGtti/raw",
-    ["99 Nights in the Forest"] = "https://raw.githubusercontent.com/wehibuyfgyuwe/99nights.github.io/refs/heads/main/ringta.lua",
-    ["Fisch"] = "https://raw.githubusercontent.com/xataxell/fisch/refs/heads/main/script.lua",
-    ["Anime Vanguards"] = "https://dollarhub.space/script/loader.lua",
-    ["Blue Lock: Rivals"] = "https://raw.githubusercontent.com/TheDarkoneMarcillisePex/Other-Scripts/refs/heads/main/Blue%20Lock%20Rivals%20GUI",
-    ["Volleyball Legends"] = "https://raw.githubusercontent.com/M1zard/LokisVoley/refs/heads/main/VolleyBallLegendsScript.lua",
-    ["Jujutsu Shenanigans"] = "https://raw.githubusercontent.com/samuiex/samui/refs/heads/main/samui%20menu",
-    ["Grand Piece Online"] = "https://raw.githubusercontent.com/Jakekill871/public-scripts/master/GrandPieceOnlineGUI",
-    ["Survive the Killer"] = "https://raw.githubusercontent.com/Biskus0/SurviveTheKiller/refs/heads/main/Loading.lua",
-    ["Berry Avenue RP"] = "https://pastefy.app/mW58xZvr/raw",
-    ["Apocalypse Rising 2"] = "https://pastebin.com/raw/B2NP4x8w",
-    ["Creatures of Sonaria"] = "https://raw.githubusercontent.com/Mangnex/Lunar-Hub/refs/heads/main/FreeLoader.lua",
-    ["Ragdoll Engine"] = "https://pastebin.com/raw/NkTcjSS7",
-    ["MeepCity"] = "https://raw.githubusercontent.com/ToraScript/Script/main/MeepCity",
-    ["Royale High"] = "https://pastes.io/raw/rh-30329-3",
-    ["Work at a Pizza Place"] = "https://raw.githubusercontent.com/Hm5011/hussain/refs/heads/main/Work%20at%20a%20pizza%20place",
-    ["Flee the Facility"] = "https://pastebin.com/raw/VBQjCrST",
-    ["Epic Minigames"] = "https://raw.githubusercontent.com/SlamminPig/rblxgames/main/Epic%20Minigames/EpicMinigamesGUI",
-    ["Theme Park Tycoon 2"] = "https://pastebin.com/raw/289f79g7060gjl28487294",
-    ["Bee Swarm Simulator"] = "https://raw.githubusercontent.com/VerbalHubz/Verbal-Hub/refs/heads/main/Bee%20Swarm%20Sim.Lua",
-    ["Vehicle Simulator"] = "https://raw.githubusercontent.com/CasperFlyModz/discord.gg-rips/main/VehicleSimulator.lua",
-    ["Da Hood"] = "https://raw.githubusercontent.com/xulfo/Oxide-Loader/main/Main.lua",
-    ["Counter Blox"] = "https://raw.githubusercontent.com/yyeptech/thebighubs/refs/heads/main/cbro.lua",
-    ["Phantom Forces"] = "https://raw.githubusercontent.com/Nickk-GG/Phantom-Force-NickHub/refs/heads/main/sc.lua",
-    ["Arsenal"] = "https://raw.githubusercontent.com/blackowl1231/Z3US/refs/heads/main/main.lua",
-    ["Strucid"] = "https://polyethelene.pages.dev/Strucid.luau",
-    ["Big Paintball"] = "https://raw.githubusercontent.com/ZaRdoOx/Fazium-files/main/Loader",
-    ["Booga Booga"] = "https://raw.githubusercontent.com/Yousuck780/Nebula-Hub/refs/heads/main/boogaboogareborn",
-    ["Islands"] = "https://system-exodus.com/scripts/Islands/Islands.lua",
-    ["Pet Simulator X"] = "https://raw.githubusercontent.com/RobloxGPT/chatgpt-scripts/refs/heads/main/fly%20gui%20v2",
-    ["Anime Adventures"] = "https://raw.githubusercontent.com/ArponAG/Scripts/main/AnimeAdventures.lua",
+    -- Add more as you find them, but remember they break often!
 }
 
 local catalog = {
@@ -176,13 +134,12 @@ local gui = make("ScreenGui", {
     DisplayOrder=50, ZIndexBehavior=Enum.ZIndexBehavior.Sibling,
 }, playerGui)
 
--- LOADING SCREEN (Text removed)
+-- LOADING SCREEN
 local intro = make("Frame", {Size=UDim2.fromScale(1,1), BackgroundColor3=THEME.bg, ZIndex=100, Visible=true}, gui)
 local introIcon = make("ImageLabel", {
     AnchorPoint=Vector2.new(.5,.5), Position=UDim2.fromScale(.5,.4), Size=UDim2.fromOffset(120,120),
     BackgroundTransparency=1, Image=LUMINA_ICON, ImageColor3=THEME.white
 }, intro)
--- The "L U M I N A" text was here, it is now removed.
 local introSub = label(intro, "LOADING YOUR LIBRARY...", 10, THEME.muted, Enum.Font.GothamMedium)
 introSub.AnchorPoint=Vector2.new(.5,.5); introSub.Position=UDim2.fromScale(.5,.58)
 introSub.Size=UDim2.fromOffset(300,24); introSub.TextXAlignment=Enum.TextXAlignment.Center
@@ -230,7 +187,7 @@ local detailName=label(details,"Game name",23,THEME.white,Enum.Font.GothamBold);
 local detailGenre=label(details,"GENRE",10,THEME.purple,Enum.Font.GothamBold); detailGenre.Position=UDim2.fromOffset(20,256); detailGenre.Size=UDim2.new(1,-40,0,22); detailGenre.ZIndex=21
 local detailDescription=label(details,"",12,THEME.muted); detailDescription.Position=UDim2.fromOffset(20,284); detailDescription.Size=UDim2.new(1,-40,0,58); detailDescription.TextWrapped=true; detailDescription.TextYAlignment=Enum.TextYAlignment.Top; detailDescription.ZIndex=21
 local detailFavorite=make("TextButton",{Text="☆  ADD TO FAVORITES",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.purpleDark,Position=UDim2.fromOffset(19,335),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(detailFavorite,9)
-local playButton=make("TextButton",{Text="OPEN ROBLOX EXPERIENCE  ↗",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.card,Position=UDim2.fromOffset(19,380),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(playButton,9); stroke(playButton,THEME.line,.25)
+local playButton=make("TextButton",{Text="COPY PLACE ID",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.card,Position=UDim2.fromOffset(19,380),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(playButton,9); stroke(playButton,THEME.line,.25)
 local detailId=label(details,"Place ID",10,THEME.muted); detailId.Position=UDim2.fromOffset(20,425); detailId.Size=UDim2.new(1,-40,0,22); detailId.ZIndex=21
 
 local settingsPanel=make("Frame",{Position=UDim2.fromOffset(19,73),Size=UDim2.new(1,-38,0,185),BackgroundColor3=THEME.panel,Visible=false},body); corner(settingsPanel,12); stroke(settingsPanel,THEME.line,.35)
@@ -315,13 +272,20 @@ local function showDetails(item)
             if success then
                 scriptBtn.Text = "SCRIPT LOADED!"; scriptBtn.BackgroundColor3 = THEME.green
             else
-                scriptBtn.Text = "FAILED - TRY AGAIN"; scriptBtn.BackgroundColor3 = THEME.red
+                scriptBtn.Text = "FAILED - CHECK CONSOLE"; scriptBtn.BackgroundColor3 = THEME.red
                 warn("Lumina script load failed: ", err)
             end
             task.delay(2, function()
                 if scriptBtn and scriptBtn.Parent then scriptBtn.Text = "LOAD SCRIPT"; scriptBtn.BackgroundColor3 = THEME.green end
             end)
         end)
+    else
+        local noScriptBtn = make("TextButton", {
+            Name = "ScriptButton", Text = "NO SCRIPT AVAILABLE YET", TextSize = 11, TextColor3 = THEME.muted,
+            Font = Enum.Font.GothamBold, BackgroundColor3 = THEME.card,
+            Position = UDim2.fromOffset(19, 470), Size = UDim2.new(1, -38, 0, 39), ZIndex = 21
+        }, details)
+        corner(noScriptBtn, 9)
     end
 end
 
@@ -398,12 +362,29 @@ detailFavorite.MouseButton1Click:Connect(function()
     detailFavorite.Text=favorites[selectedGame.name] and "★  REMOVE FROM FAVORITES" or "☆  ADD TO FAVORITES"
     if currentPage=="Favorites" then render() end
 end)
+
+-- NEW: Copy Place ID instead of Teleporting
 playButton.MouseButton1Click:Connect(function()
     if not selectedGame then return end
-    local ok,err=pcall(function() TeleportService:Teleport(selectedGame.id,player) end)
-    if not ok then
-        playButton.Text="TELEPORT UNAVAILABLE"; task.delay(2,function() if playButton.Parent then playButton.Text="OPEN ROBLOX EXPERIENCE  ↗" end end)
-        warn("Lumina teleport failed: ",err)
+    local success = copyToClipboard(tostring(selectedGame.id))
+    if success then
+        playButton.Text="COPIED! JOIN MANUALLY"
+        playButton.BackgroundColor3=THEME.green
+        task.delay(3,function() 
+            if playButton.Parent then 
+                playButton.Text="COPY PLACE ID"
+                playButton.BackgroundColor3=THEME.card
+            end 
+        end)
+    else
+        playButton.Text="COPY FAILED"
+        playButton.BackgroundColor3=THEME.red
+        task.delay(3,function() 
+            if playButton.Parent then 
+                playButton.Text="COPY PLACE ID"
+                playButton.BackgroundColor3=THEME.card
+            end 
+        end)
     end
 end)
 
@@ -455,7 +436,6 @@ task.spawn(function()
     introSub.Text = "READY."
     tween(intro, 0.6, {BackgroundTransparency = 1})
     tween(introIcon, 0.6, {ImageTransparency = 1})
-    -- Note: The old "LUMINA" text tween was removed here
     tween(introSub, 0.6, {TextTransparency = 1})
     tween(barBack, 0.6, {BackgroundTransparency = 1})
     tween(bar, 0.6, {BackgroundTransparency = 1})
