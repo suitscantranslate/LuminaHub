@@ -1,14 +1,9 @@
 -- ==========================================
--- LUMINA HUB - MAIN SCRIPT
+-- LUMINA HUB - KEY SYSTEM (main.lua)
 -- ==========================================
 
 local CoreGui = game:GetService("CoreGui")
-local Players = game:GetService("Players")
-local HttpService = game:GetService("HttpService")
 
--- ==========================================
--- PART 1: THE KEY SYSTEM
--- ==========================================
 local function LoadKeySystem()
     local ScreenGui = Instance.new("ScreenGui", CoreGui)
     ScreenGui.Name = "LuminaKeySystem"
@@ -17,7 +12,7 @@ local function LoadKeySystem()
     local Frame = Instance.new("Frame", ScreenGui)
     Frame.Size = UDim2.new(0, 300, 0, 220)
     Frame.Position = UDim2.new(0.5, -150, 0.5, -110)
-    Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Matches your UI
     Frame.BorderSizePixel = 0
     local UICorner = Instance.new("UICorner", Frame)
     UICorner.CornerRadius = UDim.new(0, 10)
@@ -44,8 +39,8 @@ local function LoadKeySystem()
     local Submit = Instance.new("TextButton", Frame)
     Submit.Size = UDim2.new(0, 250, 0, 40)
     Submit.Position = UDim2.new(0.5, -125, 0.7, 0)
-    Submit.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
-    Submit.TextColor3 = Color3.fromRGB(15, 15, 15)
+    Submit.BackgroundColor3 = Color3.fromRGB(164, 119, 255) -- Your purple theme
+    Submit.TextColor3 = Color3.fromRGB(255, 255, 255)
     Submit.Text = "Verify Key"
     Submit.Font = Enum.Font.GothamBold
     Submit.TextSize = 14
@@ -56,78 +51,19 @@ local function LoadKeySystem()
         -- Change "LUMINA-VIP-2024" to whatever key you want!
         if TextBox.Text == "LUMINA-VIP-2024" then 
             ScreenGui:Destroy()
-            _G.LuminaPassed = true -- Saves it in memory
-            LoadMainHub() -- Loads the hub directly
+            
+            -- THIS IS THE IMPORTANT PART: It loads your hub.lua
+            -- Replace the URL below with the RAW link of your hub.lua
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/suitscantranslate/LuminaHub/main/hub.lua"))() 
+            
         else
             Submit.Text = "Invalid Key!"
-            wait(2)
+            task.wait(2)
             Submit.Text = "Verify Key"
         end
     end)
 end
 
--- ==========================================
--- PART 2: THE MAIN HUB UI
--- ==========================================
-local function LoadMainHub()
-    local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
-    local Window = Rayfield:CreateWindow({
-        Name = "Lumina Hub",
-        LoadingTitle = "Lumina",
-        LoadingSubtitle = "Premium Script Hub",
-        ConfigurationSaving = {
-            Enabled = true,
-            FolderName = "LuminaHub",
-            FileName = "LuminaConfig"
-        },
-        KeySystem = false -- Key system is handled above
-    })
-
-    -- Create Tabs for different games
-    local UniversalTab = Window:CreateTab("Universal", 4483362458) 
-    local BloxFruitsTab = Window:CreateTab("Blox Fruits", 4483362458)
-    local PetSimTab = Window:CreateTab("Pet Simulator 99", 4483362458)
-    local ArsenalTab = Window:CreateTab("Arsenal", 4483362458)
-
-    -- Universal Scripts
-    UniversalTab:CreateSection("Universal Features")
-    UniversalTab:CreateButton({
-        Name = "Infinite Yield (Admin)",
-        Callback = function()
-            loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-        end,
-    })
-
-    -- Blox Fruits Scripts
-    BloxFruitsTab:CreateSection("Blox Fruits Auto Farm")
-    BloxFruitsTab:CreateButton({
-        Name = "Load Auto Farm",
-        Callback = function()
-            -- Put your Blox Fruits script loadstring here
-            Rayfield:Notify({Title = "Lumina", Content = "Loading Blox Fruits Script...", Duration = 3})
-        end,
-    })
-
-    -- Arsenal Scripts
-    ArsenalTab:CreateSection("Arsenal Aimbot")
-    ArsenalTab:CreateButton({
-        Name = "Load Aimbot",
-        Callback = function()
-            -- Put your Arsenal script loadstring here
-            Rayfield:Notify({Title = "Lumina", Content = "Loading Arsenal Aimbot...", Duration = 3})
-        end,
-    })
-end
-
--- ==========================================
--- START THE HUB
--- ==========================================
-
 if game:GetService("RunService"):IsStudio() == false then
-    if not _G.LuminaPassed then
-        LoadKeySystem()
-    else
-        LoadMainHub()
-    end
+    LoadKeySystem()
 end
