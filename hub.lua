@@ -4,7 +4,6 @@ local TweenService = game:GetService("TweenService")
 local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local ContentProvider = game:GetService("ContentProvider")
-local GuiService = game:GetService("GuiService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -54,9 +53,7 @@ local function label(parent, value, size, color, font)
     }, parent)
 end
 
--- ==========================================
--- SCRIPT URL MAPPING (49 GAMES)
--- ==========================================
+-- SCRIPT URL MAPPING
 local scriptURLs = {
     ["Brookhaven RP"] = "https://raw.githubusercontent.com/nxvap/Hexagon/refs/heads/main/brookhaven",
     ["Adopt Me!"] = "https://raw.githubusercontent.com/eIysia-dev/best/refs/heads/main/loader",
@@ -179,9 +176,7 @@ local gui = make("ScreenGui", {
     DisplayOrder=50, ZIndexBehavior=Enum.ZIndexBehavior.Sibling,
 }, playerGui)
 
--- ==========================================
 -- LOADING SCREEN
--- ==========================================
 local intro = make("Frame", {Size=UDim2.fromScale(1,1), BackgroundColor3=THEME.bg, ZIndex=100, Visible=true}, gui)
 local introIcon = make("ImageLabel", {
     AnchorPoint=Vector2.new(.5,.5), Position=UDim2.fromScale(.5,.4), Size=UDim2.fromOffset(120,120),
@@ -199,9 +194,7 @@ local bar=make("Frame",{Size=UDim2.new(0,0,1,0),BackgroundColor3=THEME.purple,ZI
 local pulseTween = TweenService:Create(introIcon, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Size = UDim2.fromOffset(135, 135)})
 pulseTween:Play()
 
--- ==========================================
 -- MAIN WINDOW
--- ==========================================
 local main=make("Frame",{Name="Main",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.53),Size=UDim2.fromScale(.88,.82),BackgroundColor3=THEME.bg,Visible=false,ClipsDescendants=true},gui)
 corner(main,17); stroke(main,THEME.line,.1)
 make("UISizeConstraint",{MinSize=Vector2.new(320,400),MaxSize=Vector2.new(1050,760)},main)
@@ -231,15 +224,16 @@ make("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,Padding=UDim.ne
 local cards=make("ScrollingFrame",{Position=UDim2.fromOffset(19,159),Size=UDim2.new(1,-38,1,-176),BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=3,ScrollBarImageColor3=THEME.purple,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new()},body)
 local grid=make("UIGridLayout",{CellSize=UDim2.fromOffset(160,158),CellPadding=UDim2.fromOffset(10,10),SortOrder=Enum.SortOrder.LayoutOrder},cards)
 
-local details=make("Frame",{Name="Details",Position=UDim2.fromScale(1,0),Size=UDim2.fromScale(1,1),BackgroundColor3=THEME.bg,Visible=false,ZIndex=20},body)
+-- DETAILS PANEL (NOW A SCROLLING FRAME FOR MOBILE)
+local details=make("ScrollingFrame",{Name="Details",Position=UDim2.fromScale(1,0),Size=UDim2.fromScale(1,1),BackgroundColor3=THEME.bg,Visible=false,ZIndex=20,CanvasSize=UDim2.new(0,0,0,650),ScrollBarThickness=3,ScrollBarImageColor3=THEME.purple},body)
 local back=make("TextButton",{Text="←  BACK TO LIBRARY",TextSize=11,TextColor3=THEME.muted,Font=Enum.Font.GothamMedium,BackgroundTransparency=1,Position=UDim2.fromOffset(19,12),Size=UDim2.fromOffset(190,31),ZIndex=21},details)
 local detailImage=make("ImageLabel",{Position=UDim2.fromOffset(19,53),Size=UDim2.new(1,-38,0,160),BackgroundColor3=THEME.card,Image="",ScaleType=Enum.ScaleType.Crop,ZIndex=21},details); corner(detailImage,12)
 local detailName=label(details,"Game name",23,THEME.white,Enum.Font.GothamBold); detailName.Position=UDim2.fromOffset(19,222); detailName.Size=UDim2.new(1,-38,0,34); detailName.ZIndex=21
 local detailGenre=label(details,"GENRE",10,THEME.purple,Enum.Font.GothamBold); detailGenre.Position=UDim2.fromOffset(20,256); detailGenre.Size=UDim2.new(1,-40,0,22); detailGenre.ZIndex=21
 local detailDescription=label(details,"",12,THEME.muted); detailDescription.Position=UDim2.fromOffset(20,284); detailDescription.Size=UDim2.new(1,-40,0,58); detailDescription.TextWrapped=true; detailDescription.TextYAlignment=Enum.TextYAlignment.Top; detailDescription.ZIndex=21
-local detailFavorite=make("TextButton",{Text="☆  ADD TO FAVORITES",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.purpleDark,Position=UDim2.fromOffset(19,352),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(detailFavorite,9)
-local playButton=make("TextButton",{Text="OPEN ROBLOX EXPERIENCE  ↗",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.card,Position=UDim2.fromOffset(19,399),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(playButton,9); stroke(playButton,THEME.line,.25)
-local detailId=label(details,"Place ID",10,THEME.muted); detailId.Position=UDim2.fromOffset(20,443); detailId.Size=UDim2.new(1,-40,0,22); detailId.ZIndex=21
+local detailFavorite=make("TextButton",{Text="☆  ADD TO FAVORITES",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.purpleDark,Position=UDim2.fromOffset(19,335),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(detailFavorite,9)
+local playButton=make("TextButton",{Text="OPEN ROBLOX EXPERIENCE  ↗",TextSize=11,TextColor3=THEME.white,Font=Enum.Font.GothamBold,BackgroundColor3=THEME.card,Position=UDim2.fromOffset(19,380),Size=UDim2.new(1,-38,0,39),ZIndex=21},details); corner(playButton,9); stroke(playButton,THEME.line,.25)
+local detailId=label(details,"Place ID",10,THEME.muted); detailId.Position=UDim2.fromOffset(20,425); detailId.Size=UDim2.new(1,-40,0,22); detailId.ZIndex=21
 
 local settingsPanel=make("Frame",{Position=UDim2.fromOffset(19,73),Size=UDim2.new(1,-38,0,185),BackgroundColor3=THEME.panel,Visible=false},body); corner(settingsPanel,12); stroke(settingsPanel,THEME.line,.35)
 local settingsTitle=label(settingsPanel,"Appearance",15,THEME.white,Enum.Font.GothamBold); settingsTitle.Position=UDim2.fromOffset(14,10)
@@ -293,9 +287,6 @@ local function clearCards()
     for _,child in ipairs(cards:GetChildren()) do if child:IsA("Frame") or child:IsA("TextLabel") then child:Destroy() end end
 end
 
--- ==========================================
--- UPDATED DETAILS PANEL WITH LOAD SCRIPT BUTTON
--- ==========================================
 local function showDetails(item)
     selectedGame=item
     detailName.Text=item.name
@@ -308,17 +299,15 @@ local function showDetails(item)
     details.Position=UDim2.fromScale(1,0)
     tween(details,.28,{Position=UDim2.fromScale(0,0)})
 
-    -- Remove old script button if it exists
     local existingScriptBtn = details:FindFirstChild("ScriptButton")
     if existingScriptBtn then existingScriptBtn:Destroy() end
 
-    -- Add the LOAD SCRIPT button
     local scriptUrl = scriptURLs[item.name]
     if scriptUrl then
         local scriptBtn = make("TextButton", {
             Name = "ScriptButton", Text = "LOAD SCRIPT", TextSize = 11, TextColor3 = THEME.white,
             Font = Enum.Font.GothamBold, BackgroundColor3 = THEME.green,
-            Position = UDim2.fromOffset(19, 450), Size = UDim2.new(1, -38, 0, 39), ZIndex = 21
+            Position = UDim2.fromOffset(19, 470), Size = UDim2.new(1, -38, 0, 39), ZIndex = 21
         }, details)
         corner(scriptBtn, 9)
 
@@ -449,9 +438,7 @@ UserInputService.InputEnded:Connect(function(input)
     if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then dragging=false end
 end)
 
--- ==========================================
 -- INITIALIZATION & LOADING SEQUENCE
--- ==========================================
 navigate("Home")
 render()
 
